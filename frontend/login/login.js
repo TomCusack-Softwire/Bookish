@@ -6,26 +6,24 @@ function submit_form(event) {
     var username = encodeURI(document.getElementById("username").value);
     var password = encodeURI(document.getElementById("password").value);
 
-    var form = new FormData(event.target);
     var XHR = new XMLHttpRequest();
-    XHR.open('GET', `http://localhost:3000/tryToLogIn?username=${username}&password=${password}`, true);
+    XHR.open('POST', "/login", true);
     XHR.setRequestHeader('Content-Type', 'application/json');
 
-    XHR.onload = function () {
+    XHR.onreadystatechange = function () {
         // Handle response here using e.g. XHR.status, XHR.response, XHR.responseText
         document.body.style.cursor = "default";
         document.getElementById("submit_button").disabled = false;
 
-        if (XHR.status === 200) {
-            window.location = "/";
+        if (XHR.readyState === XMLHttpRequest.DONE && XHR.status === 200) {
+            window.location.href = "/";
         } else {
             document.getElementById("textbox").innerHTML = XHR.responseText;
         }
     };
 
-    XHR.send();
-}
-
-window.onload = () => {
-    console.log("HELLO");
+    XHR.send(JSON.stringify({
+        username: username,
+        password: password,
+    }));
 }
