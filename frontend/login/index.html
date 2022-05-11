@@ -11,12 +11,14 @@
     <div id="textbox"></div>
     <br>
     <label for="username"> Username </label>
-    <input type="text" id="username" autocomplete="username" placeholder="Username" required/>
+    <input type="text" id="username" autocomplete="username" placeholder="Username" maxlength="32" required/>
     <br>
     <label for="password"> Password </label>
-    <input type="password" id="password" autocomplete="current-password" placeholder="Password" required/>
+    <input type="password" id="password" autocomplete="current-password" placeholder="Password" maxlength="32" required/>
     <br>
-    <input type="submit" id="submit_button" value="Log in"/>
+    <input type="submit" id="loginButton" value="Log in" onclick="this.form.button='Log in'"/>
+    <br>
+    <input type="submit" id="registerButton" value="Register" onclick="this.form.button='Register'"/>
 </form>
 
 </body>
