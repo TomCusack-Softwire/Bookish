@@ -1,8 +1,7 @@
-import database from "../postgresql.js";
 import {readFileSync} from "fs";
-import * as jsonwebtoken from "jsonwebtoken";
+import {default as jwt} from "jsonwebtoken";
 import express, {Router} from "express";
-const jwt = jsonwebtoken.default;
+import {User} from "../postgresql.js";
 
 // Read in 'username:password' in 'postgresql_details' file
 let secret_key;
@@ -39,8 +38,14 @@ class LoginController {
     async tryToLogIn(request, response) {
         const {username, password} = request.body;
         if (username && password) {
-            const testPassword = await database.any("SELECT Username, Password FROM Users WHERE Username=$1", [username]);
-            if (testPassword && testPassword.length === 1 && testPassword[0].password === password) {
+            const testPassword = await User.findAll({
+                attributes: ["Username", "Password"],
+                where: {
+                    Username: username,
+                }
+            });
+
+            if (testPassword && testPassword.length === 1 && testPassword[0].Password === password) {
                 this.setTokenAndRedirect(username, response);
             } else {
                 response.status(401).send("Invalid username or password.");
@@ -52,11 +57,18 @@ class LoginController {
 
     async register(request, response) {
         const {username, password} = request.body;
-        const countUsers = await database.one("SELECT COUNT(*) FROM Users WHERE Username=$1", [username]);
+        const countUsers = await User.count({
+            where: {
+                Username: username,
+            },
+        })
 
         if (username && password && username.length <= 32 && password.length <= 32) {
-            if (countUsers.count === '0') {
-                await database.none("INSERT INTO Users(Username, Password) VALUES ($1, $2)", [username, password]);
+            if (countUsers === 0) {
+                await User.create({
+                    Username: username,
+                    Password: password,
+                })
                 this.setTokenAndRedirect(username, response);
             } else {
                 response.status(401).send("Username already exists!");

@@ -1,6 +1,6 @@
-import database from "../postgresql.js";
 import {Router} from "express";
 import {verifyTokenHandler} from "./LoginController.js";
+import {Book, User} from "../postgresql.js";
 
 class UserController {
     constructor() {
@@ -17,8 +17,13 @@ class UserController {
     async getUsername(request, response) {
         const {userID} = request.params;
         if (this.isInteger(userID)) {
-            const result = await database.any("SELECT Username FROM Users WHERE ID=$1", [userID]);
-            response.send(result ?? {});
+            const result = await User.findAll({
+                attributes: ["Username"],
+                where: {
+                    ID: userID,
+                },
+            });
+            response.send(result[0] ?? {});
         } else {
             response.status(401).send("Ensure that userID is an integer.");
         }
@@ -27,8 +32,20 @@ class UserController {
     async getBooks(request, response) {
         const {userID} = request.params;
         if (this.isInteger(userID)) {
-            const result = await database.any("SELECT Books.Title, Books.Author, CheckedOut.DueDate FROM CheckedOut LEFT JOIN Books ON Books.ISBN = CheckedOut.BookID WHERE CheckedOut.UserID=$1", [userID]);
-            response.send(result ?? {});
+            const result = await User.findAll({
+                attributes: [],
+                include: {
+                    model: Book,
+                    attributes: ["Title", "Author", "ISBN"],
+                    through: {
+                        attributes: ["CheckoutDate", "DueDate"],
+                    },
+                },
+                where: {
+                    "ID": userID,
+                },
+            });
+            response.send(result[0]?.Books ?? {});
         } else {
             response.status(401).send("Ensure that userID is an integer.");
         }
