@@ -1,18 +1,17 @@
 import {Book, User} from "../postgresql.js";
 import {Router} from "express";
-import {verifyTokenHandler} from "./LoginController.js";
 import {generate_barcode, validate} from "isbn_toolbelt";
 
 class BookController {
     constructor() {
         this.router = Router();
-        this.router.get("/isbn/:isbn", verifyTokenHandler, this.getBookByISBN.bind(this));
-        this.router.get("/title/:title", verifyTokenHandler, this.getBookByTitle.bind(this));
-        this.router.get("/author/:author", verifyTokenHandler, this.getBookByAuthor.bind(this));
-        this.router.get("/", verifyTokenHandler, this.getAllBooks.bind(this));
-        this.router.get("/copies/:isbn", verifyTokenHandler, this.getCopiesOfBook.bind(this));
-        this.router.get("/add", verifyTokenHandler, this.addBook.bind(this));
-        this.router.get("/getBarcode/:isbn", verifyTokenHandler, this.getBarcode.bind(this));
+        this.router.get("/isbn/:isbn", this.getBookByISBN.bind(this));
+        this.router.get("/title/:title", this.getBookByTitle.bind(this));
+        this.router.get("/author/:author", this.getBookByAuthor.bind(this));
+        this.router.get("/", this.getAllBooks.bind(this));
+        this.router.get("/copies/:isbn", this.getCopiesOfBook.bind(this));
+        this.router.get("/add", this.addBook.bind(this));
+        this.router.get("/getBarcode/:isbn", this.getBarcode.bind(this));
     }
 
     async getBookByISBN(request, response) {

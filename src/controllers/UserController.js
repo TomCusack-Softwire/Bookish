@@ -1,12 +1,11 @@
 import {Router} from "express";
-import {verifyTokenHandler} from "./LoginController.js";
 import {Book, User} from "../postgresql.js";
 
 class UserController {
     constructor() {
         this.router = Router();
-        this.router.get("/:userID", verifyTokenHandler, this.getUsername.bind(this));
-        this.router.get("/:userID/books", verifyTokenHandler, this.getBooks.bind(this));
+        this.router.get("/:userID", this.getUsername.bind(this));
+        this.router.get("/:userID/books", this.getBooks.bind(this));
     }
 
     isInteger(number) {
